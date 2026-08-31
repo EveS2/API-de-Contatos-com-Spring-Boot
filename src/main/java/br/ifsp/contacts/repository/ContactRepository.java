@@ -2,6 +2,7 @@ package br.ifsp.contacts.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import br.ifsp.contacts.model.Contact;
+import java.util.List;
 
 /**
  * Esta interface extende JpaRepository, que nos fornece métodos prontos 
@@ -10,4 +11,10 @@ import br.ifsp.contacts.model.Contact;
  */
 public interface ContactRepository extends JpaRepository<Contact, Long> {
     // Podemos adicionar métodos personalizados se necessário.
+
+    /**
+    * Busca contatos pelo nome, ignorando maiúsculas e minúsculas.
+    */
+    List<Contact> findByNomeContainingIgnoreCase(String nome);
 }
+

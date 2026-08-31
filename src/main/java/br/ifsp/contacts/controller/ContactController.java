@@ -3,7 +3,9 @@ package br.ifsp.contacts.controller;
 import br.ifsp.contacts.model.Contact;
 import br.ifsp.contacts.repository.ContactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -37,6 +39,20 @@ public class ContactController {
     @GetMapping
     public List<Contact> getAllContacts() {
         return contactRepository.findAll();
+    }
+
+    /**
+     * Método para buscar contatos pelo nome.
+     *
+     * @GetMapping("/search") indica que este método responde a chamadas HTTP GET.
+     * @RequestParam recebe o nome como parâmetro da URL.
+     * Exemplo de acesso: GET /api/contacts/search?name=João
+     *
+     * Caso nenhum contato seja encontrado, retorna uma lista vazia.
+     */
+    @GetMapping("/search")
+    public List<Contact> searchByName(@RequestParam String name) {
+        return contactRepository.findByNomeContainingIgnoreCase(name);
     }
 
     /**
@@ -95,5 +111,36 @@ public class ContactController {
     @DeleteMapping("/{id}")
     public void deleteContact(@PathVariable Long id) {
         contactRepository.deleteById(id);
+    }
+    
+/**
+ * Método para atualizar parcialmente um contato.
+ *
+ * @PatchMapping indica que este método responde a chamadas HTTP PATCH.
+ * Permite alterar apenas os campos enviados na requisição.
+ * Exemplo de acesso: PATCH /api/contacts/1
+ *
+ * Caso o contato não exista, retorna erro 404.
+ */
+@PatchMapping("/{id}")
+    public Contact patchContact(@PathVariable Long id, @RequestBody Contact updatedContact) {
+
+        Contact existingContact = contactRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Contato não encontrado: " + id));
+
+        if (updatedContact.getNome() != null) {
+            existingContact.setNome(updatedContact.getNome());
+        }
+
+        if (updatedContact.getTelefone() != null) {
+            existingContact.setTelefone(updatedContact.getTelefone());
+        }
+
+        if (updatedContact.getEmail() != null) {
+            existingContact.setEmail(updatedContact.getEmail());
+        }
+
+        return contactRepository.save(existingContact);
     }
 }
