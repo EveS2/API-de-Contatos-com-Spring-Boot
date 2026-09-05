@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class ContactController {
      * com os dados JSON enviados no corpo da requisição.
      */
     @PostMapping
-    public Contact createContact(@RequestBody Contact contact) {
+    public Contact createContact(@Valid @RequestBody Contact contact) {
         return contactRepository.save(contact);
     }
 
